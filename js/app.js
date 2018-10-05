@@ -17,6 +17,29 @@ $(document).ready(function(){
   }
 
   function renderBookList(renderingPoint, arrBooks){
-    console.log(arrBooks);
+
+    renderingPoint.empty();
+
+    for(var i = 0; i< arrBooks.length; i++){
+      var titleDiv = getTitleDiv(arrBooks[i]);
+      var descriptionDiv = getDescriptionDiv();
+
+      renderingPoint.append(titleDiv);
+      renderingPoint.append(descriptionDiv);
+    }
   }
+
+  function getTitleDiv(bookObj){
+    var titleDiv = $("<div class='title'>");
+    titleDiv.text(bookObj.title);
+
+    return titleDiv;
+  }
+
+  function getDescriptionDiv(){
+    var descriptiondDiv = $("<div class='description'>");
+
+    return descriptiondDiv;
+  }
+
 });
