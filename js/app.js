@@ -1,4 +1,7 @@
 $(document).ready(function(){
+  var bookListRenderingPoint = $("#book-list");
+  bookListRenderingPoint
+    .on("click", "div.title", showDescription);
 
   refreshBookList();
 
@@ -9,7 +12,6 @@ $(document).ready(function(){
       data: "",
       dataType: "json",
     }).done(function(books){
-      var bookListRenderingPoint = $("#book-list");
       renderBookList(bookListRenderingPoint, books);
     }).fail(function(xhr, status, err){
       console.log("ERR", xhr, status, err);
@@ -32,6 +34,7 @@ $(document).ready(function(){
   function getTitleDiv(bookObj){
     var titleDiv = $("<div class='title'>");
     titleDiv.text(bookObj.title);
+    titleDiv.data("book-id", bookObj.id);
 
     return titleDiv;
   }
@@ -40,6 +43,40 @@ $(document).ready(function(){
     var descriptiondDiv = $("<div class='description'>");
 
     return descriptiondDiv;
+  }
+
+  function showDescription(){
+    var bookId = $(this).data("book-id");
+    var descriptionRenderingPoint = $(this).next("div.description");
+
+    $.ajax({
+      url: "http://localhost:8282/books/"+bookId,
+      type: "GET",
+      data: "",
+      dataType: "json",
+    }).done(function(book){
+      renderDescription(descriptionRenderingPoint, book);
+    }).fail(function(xhr, status, err){
+      console.log("ERR", xhr, status, err);
+    })
+  }
+
+  function renderDescription(renderingPoint, book){
+    renderingPoint.empty();
+
+    var authorP = $("<p>");
+    authorP.text("Author: " + book.author);
+    var isbnP = $("<p>");
+    isbnP.text("ISBN: " + book.isbn);
+    var typeP = $("<p>");
+    typeP.text("Type: " + book.type);
+    var publisherP = $("<p>");
+    publisherP.text("Publisher: " + book.publisher);
+
+    renderingPoint.append(authorP);
+    renderingPoint.append(isbnP);
+    renderingPoint.append(typeP);
+    renderingPoint.append(publisherP);
   }
 
 });
