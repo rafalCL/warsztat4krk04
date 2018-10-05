@@ -1,7 +1,11 @@
 $(document).ready(function(){
   var bookListRenderingPoint = $("#book-list");
+
   bookListRenderingPoint
     .on("click", "div.title", showDescription);
+
+  bookListRenderingPoint
+    .on("click", "a.del-book-btn", handleDeleteBook);
 
   var addBookForm = $("#add-book-form");
   addBookForm.on("submit", submitAddBook);
@@ -38,6 +42,10 @@ $(document).ready(function(){
     var titleDiv = $("<div class='title'>");
     titleDiv.text(bookObj.title);
     titleDiv.data("book-id", bookObj.id);
+
+    var delLink = $("<a class='del-book-btn'>");
+    delLink.text("delete");
+    titleDiv.append(delLink);
 
     return titleDiv;
   }
@@ -105,6 +113,24 @@ $(document).ready(function(){
 
     event.preventDefault();
     return false;
+  }
+
+  function handleDeleteBook(event){
+    var bookId = $(this).parent().data("book-id");
+
+    $.ajax({
+      url: "http://localhost:8282/books/"+bookId,
+      type: "DELETE",
+      data: "",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+    }).done(function(book){
+      refreshBookList();
+    }).fail(function(xhr, status, err){
+      console.log("ERR", xhr, status, err);
+    })
+
+    event.stopPropagation();
   }
 
 });

@@ -3,6 +3,10 @@
 }
 
 .description {
-  background-color: hotpink;
+  background-color: pink;
   font-size: 8px;
+}
+
+.del-book-btn {
+  background-color: red;
 }
