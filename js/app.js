@@ -3,6 +3,9 @@ $(document).ready(function(){
   bookListRenderingPoint
     .on("click", "div.title", showDescription);
 
+  var addBookForm = $("#add-book-form");
+  addBookForm.on("submit", submitAddBook);
+
   refreshBookList();
 
   function refreshBookList(){
@@ -77,6 +80,31 @@ $(document).ready(function(){
     renderingPoint.append(isbnP);
     renderingPoint.append(typeP);
     renderingPoint.append(publisherP);
+  }
+
+  function submitAddBook(event){
+    var newBook = {
+      title: this.elements.title.value,
+      author: this.elements.author.value,
+      isbn: this.elements.isbn.value,
+      publisher: this.elements.publisher.value,
+      type: this.elements.type.value
+    }
+
+    $.ajax({
+      url: "http://localhost:8282/books/",
+      type: "POST",
+      data: JSON.stringify(newBook),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+    }).done(function(book){
+      refreshBookList();
+    }).fail(function(xhr, status, err){
+      console.log("ERR", xhr, status, err);
+    })
+
+    event.preventDefault();
+    return false;
   }
 
 });
