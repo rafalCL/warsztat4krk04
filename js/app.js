@@ -13,16 +13,16 @@ $(document).ready(function(){
   refreshBookList();
 
   function refreshBookList(){
-    $.ajax({
-      url: "http://localhost:8282/books/",
-      type: "GET",
-      data: "",
-      dataType: "json",
-    }).done(function(books){
+
+    function renderBookListProxy(books){
+      var bookListRenderingPoint = $("#book-list");
       renderBookList(bookListRenderingPoint, books);
-    }).fail(function(xhr, status, err){
-      console.log("ERR", xhr, status, err);
-    })
+    }
+
+    genericSendRequest("http://localhost:8282/books/",
+                  "GET",
+                  "",
+                  renderBookListProxy);
   }
 
   function renderBookList(renderingPoint, arrBooks){
@@ -60,16 +60,14 @@ $(document).ready(function(){
     var bookId = $(this).data("book-id");
     var descriptionRenderingPoint = $(this).next("div.description");
 
-    $.ajax({
-      url: "http://localhost:8282/books/"+bookId,
-      type: "GET",
-      data: "",
-      dataType: "json",
-    }).done(function(book){
+    function renderDescriptionProxy(book){
       renderDescription(descriptionRenderingPoint, book);
-    }).fail(function(xhr, status, err){
-      console.log("ERR", xhr, status, err);
-    })
+    }
+
+    genericSendRequest("http://localhost:8282/books/"+bookId,
+                      "GET",
+                      "",
+                      renderDescriptionProxy);
   }
 
   function renderDescription(renderingPoint, book){
@@ -99,17 +97,10 @@ $(document).ready(function(){
       type: this.elements.type.value
     }
 
-    $.ajax({
-      url: "http://localhost:8282/books/",
-      type: "POST",
-      data: JSON.stringify(newBook),
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-    }).done(function(book){
-      refreshBookList();
-    }).fail(function(xhr, status, err){
-      console.log("ERR", xhr, status, err);
-    })
+    genericSendRequest("http://localhost:8282/books/",
+                      "POST",
+                      JSON.stringify(newBook),
+                      refreshBookList);
 
     event.preventDefault();
     return false;
@@ -117,20 +108,25 @@ $(document).ready(function(){
 
   function handleDeleteBook(event){
     var bookId = $(this).parent().data("book-id");
-
-    $.ajax({
-      url: "http://localhost:8282/books/"+bookId,
-      type: "DELETE",
-      data: "",
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-    }).done(function(book){
-      refreshBookList();
-    }).fail(function(xhr, status, err){
-      console.log("ERR", xhr, status, err);
-    })
+    genericSendRequest("http://localhost:8282/books/"+bookId,
+                      "DELETE",
+                      "",
+                      refreshBookList);
 
     event.stopPropagation();
+  }
+
+  function genericSendRequest(url, method, data, handleSuccessFn){
+    $.ajax({
+      url: url,
+      type: method,
+      data: data,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+    }).done(handleSuccessFn)
+      .fail(function(xhr, status, err){
+      console.log("ERR", xhr, status, err);
+    })
   }
 
 });
